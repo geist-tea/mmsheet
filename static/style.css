@@ -1,0 +1,100 @@
+@font-face {
+    font-family: "Staatliches";
+    src: url("static/Staatliches-Regular.ttf");
+}
+
+html {
+    font-family: sans-serif;
+    display: grid;
+    grid-template-rows: 50% 50%;
+}
+
+h1 {
+    background-color: #841923;
+    color: white;
+    padding-left: 0.2em;
+    padding-top: -0.2em;
+    padding-bottom: -0.2em;
+    font-family: 'Staatliches', sans-serif;
+}
+
+#tabs {
+    padding-bottom: -10em;
+}
+
+.content {
+    background-color: #e1e4eb;
+    padding: 0.2em;
+    margin: -1em 0em;
+}
+
+#abilityscore {
+    margin-top: 1.5em;
+}
+
+table {
+    margin-top: -1em;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+tr:nth-child(odd) {
+    background-color: #e1e4eb;
+}
+
+#abilityscore {
+    font-family: 'Staatliches', sans-serif;
+    font-size: 20px;
+    text-align: center;
+}
+
+
+input {
+    background: none;
+    border: none;
+    font-size: 14px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+div#tabs>button {
+    background-color: #69353a;
+    color: white;
+    padding-left: 0.2em;
+    padding-top: -0.2em;
+    padding-bottom: -0.2em;
+    font-family: 'Staatliches', sans-serif;
+    font-size: 16px;
+    text-align: center;
+    border: none;
+    margin: 0px;
+}
+
+div#tabs>button.selected {
+    background-color: #841923;
+    padding: 0.5em;
+}
+
+input[type=text] {
+    border-bottom: 1px solid black;
+}
+
+input[type=number] {
+    width: 3em;
+}
+
+div#abilityscore>table>tr {
+    background: none;
+}
+
+div#abilityscore>table>tr>td>input {
+    font-size: 20px;
+    background-color: #e1e4eb;
+}
+
+div#abilityscore>table>tr>td>label {
+    background-color: #375476;
+    padding: 0 0.9em;
+    color: white;
+}

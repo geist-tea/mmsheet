@@ -1,0 +1,31 @@
+[
+    {
+        "name": "Affliction",
+        "description": "You can impose some debilitating condition or conditions on a target by making a close attack. You set the conditions your Affliction causes at each degree when you acquire it and they may not be changed. Higher degree conditions re- place lower degree conditions and do not stack with them. See the possible conditions for each degree under the Af- fliction Resistance Check table. The target resists with Fortitude or Will defense (chosen when you take the effect)",
+        "action": "Standard",
+        "range": "Close",
+        "duration": "Instant",
+        "cost": 1,
+        "dc": 10,
+        "resisted_by": [
+            "Fortitude",
+            "Will"
+        ],
+        "notes": true,
+        "applicable_extras": [],
+        "applicable_flaws": []
+    },
+    {
+        "name": "Burrowing",
+        "description": "You can burrow through the ground, leaving a tunnel be- hind if you choose. You move through soil and sand at a speed rank equal to your Burrowing rank, minus 5. So Bur- rowing 8, for example, lets you move through the ground at speed rank 3 (around 16 MPH). Burrowing through hard clay and packed earth reduces speed one additional rank. Burrowing through solid rock reduces it by two additional ranks. The tunnel you leave behind is either permanent or collapses behind you immediately (your choice when you begin burrowing each new tunnel). Note that Burrowing differs from the Permeate effect of Movement, which allows you to pass through an obstacle like the ground at your normal speed without disturbing it at all (see Movement for details).",
+        "action": "Free",
+        "range": "Personal",
+        "duration": "Sustained",
+        "cost": 1,
+        "dc": null,
+        "resisted_by": null,
+        "notes": false,
+        "applicable_extras": [],
+        "applicable_flaws": []
+    }
+]
