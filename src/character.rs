@@ -165,10 +165,6 @@ impl<'a> Character<'a> {
         }
     }
 
-    pub fn set_name(&mut self, name: String) {
-        self.name = name;
-    }
-
     pub fn calculate_points_spent(&self) -> i32 {
         0
     }
@@ -176,6 +172,7 @@ impl<'a> Character<'a> {
     pub fn calculate_point_max(&self) -> i32 {
         (self.power_level * 15) + self.exp
     }
+
     pub fn calc_initiative(&self) -> String {
         match self.ability_scores.get("agility") {
             Some(x) => {
@@ -186,6 +183,30 @@ impl<'a> Character<'a> {
                 }
             }
             None => String::from("+0"),
+        }
+    }
+
+    pub fn calc_defense(&self, def: &str) -> String {
+        let k = *self.rulebook.stat_derivations.get(def).unwrap();
+        let a = *self.ability_scores.get(k).unwrap();
+        let b = *self.defenses.get(def).unwrap();
+        let t = a + b;
+        if t < 0 {
+            format!("{t}")
+        } else {
+            format!("+{t}")
+        }
+    }
+
+    pub fn calc_skill(&self, skill: &str) -> String {
+        let k = *self.rulebook.stat_derivations.get(skill).unwrap_or(&"int");
+        let a = *self.ability_scores.get(k).unwrap();
+        let b = *self.skills.get(skill).unwrap();
+        let t = a + b;
+        if t < 0 {
+            format!("{t}")
+        } else {
+            format!("+{t}")
         }
     }
 }

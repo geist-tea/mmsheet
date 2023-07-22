@@ -226,21 +226,28 @@ fn App(cx: Scope) -> Element {
                 activesheet.defenses.iter().map(|(k, v)| {
                     let k = (*k).clone();
                     let k_caps = String::from(k).to_uppercase();
+                    let total = activesheet.calc_defense(k);
                     rsx! {
                         tr {
                             td {b{"{k_caps}"}}
                             td {
-                                input {
-                                    value: "{v}",
-                                    r#type: "number",
-                                    oninput: move |event| { sheets.with_mut(|s| {
-                                        let val = event.value.clone();
-                                        match val.parse::<i32>() {
-                                            Ok(num) => _ = s[ga].defenses.insert(k, num),
-                                            _ => ()
-                                        }
-                                    })}
+                                if k != "toughness" {
+                                    rsx! {
+                                        input {
+                                        value: "{v}",
+                                        r#type: "number",
+                                        oninput: move |event| { sheets.with_mut(|s| {
+                                            let val = event.value.clone();
+                                            match val.parse::<i32>() {
+                                                Ok(num) => _ = s[ga].defenses.insert(k, num),
+                                                _ => ()
+                                            }
+                                        })}
+                                    }}
                                 }
+                            }
+                            td {
+                                "{total}"
                             }
                         }
                     }
@@ -303,6 +310,7 @@ fn App(cx: Scope) -> Element {
             table {
                 activesheet.skills.iter().map(|(k, v)| {
                     let k = (*k).clone();
+                    let total = activesheet.calc_skill(k);
                     rsx! {
                         tr {
                             td {"{k}"}
@@ -319,7 +327,7 @@ fn App(cx: Scope) -> Element {
                                     })}
                                 }
                             }
-                            td {"0"}
+                            td {"{total}"}
                         }
                     }
                 })

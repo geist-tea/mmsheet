@@ -73,7 +73,7 @@ pub enum Action {
 
 #[derive(PartialEq)]
 pub struct Rulebook<'a> {
-    pub stat_derivations: HashMap<String, String>,
+    pub stat_derivations: HashMap<&'a str, &'a str>,
     pub advantages: Vec<Advantage>,
     pub powers: Vec<PowerInfo>,
     pub mass: [&'a str; 36],
@@ -102,7 +102,7 @@ impl Rulebook<'_> {
 
         let reader = match File::open("./data/powers.json").map(BufReader::new) {
             Ok(r) => r,
-            Err(e) => return Err(String::from("Couldn't find ./data/powers.json")),
+            Err(_) => return Err(String::from("Couldn't find ./data/powers.json")),
         };
 
         let powers: Vec<PowerInfo> = match serde_json::from_reader(reader) {
@@ -111,7 +111,26 @@ impl Rulebook<'_> {
         };
 
         Ok(Self {
-            stat_derivations: HashMap::from([]),
+            stat_derivations: HashMap::from([
+                ("dodge", "agl"),
+                ("fortitude", "sta"),
+                ("parry", "fgt"),
+                ("will", "awe"),
+                ("toughness", "sta"),
+                ("Acrobatics", "agl"),
+                ("Athletics", "str"),
+                ("Deception", "pre"),
+                ("Insight", "awe"),
+                ("Intimidation", "pre"),
+                ("Investigation", "int"),
+                ("Perception", "awe"),
+                ("Persuasion", "pre"),
+                ("Sleight of Hand", "dex"),
+                ("Stealth", "agl"),
+                ("Technology", "int"),
+                ("Treatment", "int"),
+                ("Vehicles", "dex"),
+            ]),
             advantages: advantages,
             powers: powers,
             mass: [
