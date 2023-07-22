@@ -21,7 +21,7 @@ pub struct Character<'a> {
     pub powers: Vec<Power>,
     pub conditions: Vec<Condition>,
     pub notes: String,
-    pub rulebook: Rulebook<'a>,
+    pub rulebook: &'a Rulebook<'a>,
 }
 
 #[derive(PartialEq, Props)]
@@ -113,8 +113,8 @@ pub struct Condition {
     stat_changes: Vec<fn(String, i32) -> i32>,
 }
 
-impl Character<'_> {
-    pub fn new() -> Self {
+impl<'a> Character<'a> {
+    pub fn new(rules: &'a Rulebook) -> Self {
         Self {
             name: String::from("New Hero"),
             identity: String::from(""),
@@ -161,7 +161,7 @@ impl Character<'_> {
             powers: Vec::new(),
             conditions: Vec::new(),
             notes: String::new(),
-            rulebook: Rulebook::new().unwrap(),
+            rulebook: rules,
         }
     }
 

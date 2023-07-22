@@ -6,22 +6,29 @@ pub mod rulebook;
 use character::Character;
 use dioxus::prelude::*;
 use dioxus_desktop::{Config, WindowBuilder};
+use lazy_static::lazy_static;
 use native_dialog::MessageDialog;
 use rulebook::Rulebook;
-fn main() {
-    let rulebook = match Rulebook::new() {
-        Ok(rb) => rb,
+
+lazy_static! {
+    static ref RULEBOOK: Rulebook<'static> = match Rulebook::new() {
+        Ok(rb) => {
+            println!("Loaded {} advantages", rb.advantages.len());
+            println!("Loaded {} powers", rb.powers.len());
+            rb
+        }
         Err(e) => {
             let _ = MessageDialog::new()
                 .set_title("Error")
                 .set_type(native_dialog::MessageType::Error)
                 .set_text(e.as_str())
                 .show_alert();
-            return;
+            panic!("{}", e);
         }
     };
-    println!("Loaded {} advantages", rulebook.advantages.len());
-    println!("Loaded {} powers", rulebook.powers.len());
+}
+
+fn main() {
     dioxus_desktop::launch_cfg(
         App,
         Config::default().with_window(WindowBuilder::new().with_title("mmsheet")),
@@ -29,7 +36,7 @@ fn main() {
 }
 
 fn App(cx: Scope) -> Element {
-    let sheets: &UseRef<Vec<Character>> = use_ref(cx, || vec![Character::new()]);
+    let sheets: &UseRef<Vec<Character>> = use_ref(cx, || vec![Character::new(&RULEBOOK)]);
     let active = use_state(cx, || 0 as usize);
     let rsheets = sheets.read();
     let ga = *active.get();
@@ -61,7 +68,7 @@ fn App(cx: Scope) -> Element {
             }
             button {
                 onclick: move |_| { sheets.with_mut(|s| {
-                    s.push(Character::new());
+                    s.push(Character::new(&RULEBOOK));
                     active.set(s.len() - 1)
                 })},
                 "+"
