@@ -32,10 +32,8 @@ pub struct DerivedStat<'a> {
 }
 
 pub struct Advantage {
-    name: String,
-    summary: String,
-    description: String,
-    ranks: Option<AdvantageRanks>,
+    id: usize,
+    ranks: Option<i32>,
     notes: Option<String>,
 }
 

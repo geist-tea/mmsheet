@@ -38,6 +38,9 @@ fn main() {
 fn App(cx: Scope) -> Element {
     let sheets: &UseRef<Vec<Character>> = use_ref(cx, || vec![Character::new(&RULEBOOK)]);
     let active = use_state(cx, || 0 as usize);
+    let show_advantage_search = use_state(cx, || true);
+    let advantage_search = use_ref(cx, String::new);
+
     let rsheets = sheets.read();
     let ga = *active.get();
     let activesheet = &rsheets[ga];
@@ -331,6 +334,75 @@ fn App(cx: Scope) -> Element {
                         }
                     }
                 })
-            }}
+            }
+        }
+        div {
+            id:"advantages",
+            h1 {
+                "Advantages"
+                button {
+                    class: "add",
+                    onclick: move |event| {show_advantage_search.set(false)},
+                    "+"
+                }
+            }
+            activesheet.advantages.iter().map(|idx| {
+                rsx! { p { "{RULEBOOK.advantages[*idx].name}" } }
+            })
+        }
+        div {
+            id: "advantages_popup",
+            class: "modal",
+            hidden: "{show_advantage_search.get()}",
+            div {
+                class: "modal-content",
+                h1 {
+                    "Add Advantages"
+                    button {
+                        class: "add",
+                        onclick: move |event| {show_advantage_search.set(true)},
+                        "x"
+                    }
+                }
+                input {
+                    r#type: "text",
+                    value: "{advantage_search.read()}",
+                    oninput: |event| { advantage_search.with_mut(|s| { *s = event.value.clone() })},
+                }
+                table {
+                    tr {
+                        th {"Name"}
+                        th {"Type"}
+                        th {colspan: "2", "Summary"}
+                    }
+                    RULEBOOK.advantages.iter().filter(|a| a.name.contains(advantage_search.read().as_str())).enumerate().map(|(idx, a)| {
+                        rsx! {
+                            tr {
+                                td {
+                                    "{a.name}"
+                                }
+                                td {
+                                    "{a.r#type}"
+                                }
+                                td {
+                                    "{a.summary}"
+                                }
+                                td {
+                                    button {
+                                        class: "modal_add",
+                                        onclick: move |event| {
+                                            sheets.with_mut(|s| {
+                                                s[ga].advantages.push(idx);
+                                            })
+                                        },
+                                        "+"
+                                    }
+                                }
+                            }
+                        }
+                    })
+                }
+            }
+        }
     )
 }

@@ -1,14 +1,14 @@
-use std::{collections::HashMap, fs::File, io::BufReader};
+use std::{collections::HashMap, fmt, fs::File, io::BufReader};
 
 #[derive(PartialEq, serde::Deserialize)]
 pub struct Advantage {
-    name: String,
-    summary: String,
-    description: String,
-    r#type: AdvantageType,
-    ranked: bool,
-    max_ranks: Option<i32>,
-    notes: bool,
+    pub name: String,
+    pub summary: String,
+    pub description: String,
+    pub r#type: AdvantageType,
+    pub ranked: bool,
+    pub max_ranks: Option<i32>,
+    pub notes: bool,
 }
 
 #[derive(PartialEq, serde::Deserialize)]
@@ -17,6 +17,17 @@ pub enum AdvantageType {
     Fortune,
     General,
     Skill,
+}
+
+impl fmt::Display for AdvantageType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            AdvantageType::Combat => write!(f, "Combat"),
+            AdvantageType::Fortune => write!(f, "Fortune"),
+            AdvantageType::General => write!(f, "General"),
+            AdvantageType::Skill => write!(f, "Skill"),
+        }
+    }
 }
 
 #[derive(PartialEq, serde::Deserialize)]
