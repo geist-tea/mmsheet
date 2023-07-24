@@ -346,9 +346,55 @@ fn App(cx: Scope) -> Element {
                     "+"
                 }
             }
-            activesheet.advantages.iter().map(|idx| {
-                rsx! { p { "{RULEBOOK.advantages[*idx].name}" } }
-            })
+            table {
+                activesheet.advantages.iter().enumerate().map(|(idx, a)| {
+                    let notes = a.notes.clone();
+                    rsx! {
+                        tr {
+                            td {"{RULEBOOK.advantages[a.id].name}" }
+                            match a.ranks {
+                                Some(val) => rsx! {
+                                    td {
+                                        input {
+                                            r#type: "number",
+                                            value: "{val}",
+                                            oninput: move |event| { sheets.with_mut( |s| {
+                                                let val = event.value.clone();
+                                                match val.parse::<i32>() {
+                                                    Ok(num) => s[ga].set_advantage_ranks(idx, num),
+                                                    _ => ()
+                                                }
+                                            })}
+                                        }
+                                    }
+                                },
+                                None => rsx! {td{}}
+                            }
+                            match notes {
+                                Some(val) => rsx! {
+                                    td {
+                                        input {
+                                            r#type: "text",
+                                            value: "{val}",
+                                            size: "40",
+                                            oninput: move |event| { sheets.with_mut( |s| {
+                                                let val = s[ga].set_advantage_note(idx, event.value.clone());
+                                            })}
+                                        }
+                                    }
+                                },
+                                None => rsx! {td{}}
+                            }
+                            td {
+                                button {
+                                    onclick: move |_| {sheets.with_mut(|s| s[ga].delete_advantage(idx))},
+                                    "x"
+                                }
+                            }
+                        }
+                    }
+                })
+            }
         }
         div {
             id: "advantages_popup",
@@ -375,7 +421,7 @@ fn App(cx: Scope) -> Element {
                         th {"Type"}
                         th {colspan: "2", "Summary"}
                     }
-                    RULEBOOK.advantages.iter().filter(|a| a.name.contains(advantage_search.read().as_str())).enumerate().map(|(idx, a)| {
+                    RULEBOOK.advantages.iter().filter(|a| a.name.contains(advantage_search.read().as_str())).enumerate().filter(|(idx, _)| !activesheet.has_advantage(*idx)).map(|(idx, a)| {
                         rsx! {
                             tr {
                                 td {
@@ -392,7 +438,7 @@ fn App(cx: Scope) -> Element {
                                         class: "modal_add",
                                         onclick: move |event| {
                                             sheets.with_mut(|s| {
-                                                s[ga].advantages.push(idx);
+                                                s[ga].add_advantage(idx);
                                             })
                                         },
                                         "+"

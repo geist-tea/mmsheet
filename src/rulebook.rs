@@ -1,7 +1,7 @@
 use std::{collections::HashMap, fmt, fs::File, io::BufReader};
 
 #[derive(PartialEq, serde::Deserialize)]
-pub struct Advantage {
+pub struct AdvantageInfo {
     pub name: String,
     pub summary: String,
     pub description: String,
@@ -85,7 +85,7 @@ pub enum Action {
 #[derive(PartialEq)]
 pub struct Rulebook<'a> {
     pub stat_derivations: HashMap<&'a str, &'a str>,
-    pub advantages: Vec<Advantage>,
+    pub advantages: Vec<AdvantageInfo>,
     pub powers: Vec<PowerInfo>,
     pub mass: [&'a str; 36],
     pub time: [&'a str; 36],
@@ -96,27 +96,22 @@ pub struct Rulebook<'a> {
 impl Rulebook<'_> {
     /// Creates a new Rulebook instance. Looks in ./data/ for all of the necessary files, and returns an error if any are missing.
     pub fn new() -> Result<Self, String> {
-        let mut advantage_csv_rdr = match csv::ReaderBuilder::new()
-            .delimiter(b'\t')
-            .from_path("./data/advantages.csv")
-        {
-            Ok(rdr) => rdr,
-            Err(_) => return Err(String::from("Couldn't find ./data/advantages.csv")),
+        let adv_reader = match File::open("./data/advantages.json").map(BufReader::new) {
+            Ok(r) => r,
+            Err(_) => return Err(String::from("Couldn't find ./data/advantages.json")),
         };
-        let mut advantages: Vec<Advantage> = Vec::new();
-        for result in advantage_csv_rdr.deserialize() {
-            match result {
-                Ok(a) => advantages.push(a),
-                Err(e) => println!("{}", e),
-            }
-        }
 
-        let reader = match File::open("./data/powers.json").map(BufReader::new) {
+        let advantages: Vec<AdvantageInfo> = match serde_json::from_reader(adv_reader) {
+            Ok(data) => data,
+            Err(e) => return Err(e.to_string()),
+        };
+
+        let pow_reader = match File::open("./data/powers.json").map(BufReader::new) {
             Ok(r) => r,
             Err(_) => return Err(String::from("Couldn't find ./data/powers.json")),
         };
 
-        let powers: Vec<PowerInfo> = match serde_json::from_reader(reader) {
+        let powers: Vec<PowerInfo> = match serde_json::from_reader(pow_reader) {
             Ok(data) => data,
             Err(e) => return Err(e.to_string()),
         };

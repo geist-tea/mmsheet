@@ -6,7 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-csv = "1.2.2"
 dioxus = "0.3.2"
 dioxus-desktop = "0.3.0"
 indexmap = "2.0.0"

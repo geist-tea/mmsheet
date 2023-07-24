@@ -1,7 +1,9 @@
+use std::ops::IndexMut;
+
 use dioxus::prelude::Props;
 use indexmap::IndexMap;
 
-use crate::rulebook::Rulebook;
+use crate::rulebook::{AdvantageInfo, Rulebook};
 
 #[derive(PartialEq, Props)]
 pub struct Character<'a> {
@@ -17,7 +19,7 @@ pub struct Character<'a> {
     pub defenses: IndexMap<&'a str, i32>,
     pub skills: IndexMap<&'a str, i32>,
     pub offense: IndexMap<&'a str, i32>,
-    pub advantages: Vec<usize>,
+    pub advantages: Vec<Advantage>,
     pub powers: Vec<Power>,
     pub conditions: Vec<Condition>,
     pub notes: String,
@@ -31,10 +33,11 @@ pub struct DerivedStat<'a> {
     pub total: i32,
 }
 
+#[derive(PartialEq)]
 pub struct Advantage {
-    id: usize,
-    ranks: Option<i32>,
-    notes: Option<String>,
+    pub id: usize,
+    pub ranks: Option<i32>,
+    pub notes: Option<String>,
 }
 
 pub enum AdvantageType {
@@ -205,6 +208,58 @@ impl<'a> Character<'a> {
             format!("{t}")
         } else {
             format!("+{t}")
+        }
+    }
+
+    pub fn add_advantage(&mut self, id: usize) {
+        self.advantages
+            .push(Advantage::new(id, &self.rulebook.advantages[id]))
+    }
+
+    pub fn has_advantage(&self, id: usize) -> bool {
+        self.advantages
+            .iter()
+            .map(|a| a.id == id)
+            .reduce(|l, r| l || r)
+            .unwrap_or(false)
+    }
+
+    pub fn set_advantage_ranks(&mut self, idx: usize, new_rank: i32) {
+        let max_rank = self.rulebook.advantages[self.advantages[idx].id]
+            .max_ranks
+            .unwrap_or(999);
+
+        match self.advantages[idx].ranks {
+            Some(_) => {
+                self.advantages[idx].ranks = Some(if new_rank <= max_rank {
+                    new_rank
+                } else {
+                    max_rank
+                })
+            }
+            None => (),
+        }
+    }
+
+    pub fn set_advantage_note(&mut self, idx: usize, new_note: String) {
+        self.advantages[idx].notes = Some(new_note);
+    }
+
+    pub fn delete_advantage(&mut self, idx: usize) {
+        self.advantages.remove(idx);
+    }
+}
+
+impl Advantage {
+    pub fn new(id: usize, from: &AdvantageInfo) -> Self {
+        Self {
+            id: id,
+            ranks: if from.ranked { Some(0) } else { None },
+            notes: if from.notes {
+                Some(String::new())
+            } else {
+                None
+            },
         }
     }
 }
