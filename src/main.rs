@@ -53,7 +53,7 @@ fn App(cx: Scope) -> Element {
 
     let aidx_val = *active_idx.read();
 
-    render!{
+    render! {
         CharacterTabs {}
         CharacterInfo {}
         AbilityScores {}
@@ -147,7 +147,7 @@ fn App(cx: Scope) -> Element {
                                 th {"Type"}
                                 th {colspan: "2", "Summary"}
                             }
-                            RULEBOOK.advantages.iter().filter(|a| a.name.contains(search.read().as_str())).enumerate().filter(|(idx, _)| !sheets.read()[aidx_val].has_advantage(*idx)).map(|(idx, a)| {
+                            RULEBOOK.advantages.iter().enumerate().filter(|(_, a)| a.name.contains(search.read().as_str())).filter(|(idx, _)| !sheets.read()[aidx_val].has_advantage(*idx)).map(|(idx, a)| {
                                 rsx! {
                                     tr {
                                         td {
