@@ -2,7 +2,7 @@
 
 use dioxus::prelude::*;
 
-use crate::{character::Character, Modal, RULEBOOK};
+use crate::{character::Character, RULEBOOK};
 
 pub fn CharacterTabs(cx: Scope) -> Element {
     let sheets = use_shared_state::<Vec<Character>>(cx).unwrap();
@@ -362,7 +362,7 @@ pub fn Advantages(cx: Scope) -> Element {
                 "Advantages"
                 button {
                     class: "add",
-                    onclick: move |event| {},
+                    onclick: move |_| {},
                     "+"
                 }
             }
@@ -398,7 +398,7 @@ pub fn Advantages(cx: Scope) -> Element {
                                             value: "{val}",
                                             size: "40",
                                             oninput: move |event| {
-                                                let val = sheets.write()[aidx_val].set_advantage_note(idx, event.value.clone());
+                                                sheets.write()[aidx_val].set_advantage_note(idx, event.value.clone());
                                             }
                                         }
                                     }
@@ -437,7 +437,7 @@ pub fn AdvantageSearchModal(cx: Scope) -> Element {
                     "Add Advantages"
                     button {
                         class: "add",
-                        onclick: move |event| {},
+                        onclick: move |_| {},
                         "x"
                     }
                 }
@@ -467,7 +467,7 @@ pub fn AdvantageSearchModal(cx: Scope) -> Element {
                                 td {
                                     button {
                                         class: "modal_add",
-                                        onclick: move |event| { sheets.write()[aidx_val].add_advantage(idx) },
+                                        onclick: move |_| { sheets.write()[aidx_val].add_advantage(idx) },
                                         "+"
                                     }
                                 }

@@ -31,6 +31,12 @@ impl fmt::Display for AdvantageType {
 }
 
 #[derive(PartialEq, serde::Deserialize)]
+enum AttackType {
+    Close,
+    Ranged,
+}
+
+#[derive(PartialEq, serde::Deserialize)]
 pub struct PowerInfo {
     name: String,
     description: String,
@@ -38,6 +44,7 @@ pub struct PowerInfo {
     range: Range,
     duration: PowerDuration,
     cost: i32,
+    attack: Option<AttackType>,
     dc: Option<i32>,
     resisted_by: Option<Vec<String>>,
     notes: bool,
