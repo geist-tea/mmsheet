@@ -11,7 +11,7 @@ use lazy_static::lazy_static;
 use native_dialog::MessageDialog;
 use rulebook::Rulebook;
 
-use crate::gui::*;
+use crate::{character::PowerEntry, gui::*};
 
 lazy_static! {
     static ref RULEBOOK: Rulebook<'static> = match Rulebook::new() {
@@ -41,6 +41,7 @@ fn main() {
 enum Modal {
     Hidden,
     AdvantageSearch,
+    NewPowerType,
 }
 
 fn App(cx: Scope) -> Element {
@@ -60,6 +61,7 @@ fn App(cx: Scope) -> Element {
         Defense {}
         Offense {}
         Skills {}
+
         div {
             id:"advantages",
             h1 {
@@ -102,7 +104,7 @@ fn App(cx: Scope) -> Element {
                                             value: "{val}",
                                             size: "40",
                                             oninput: move |event| {
-                                                let val = sheets.write()[aidx_val].set_advantage_note(idx, event.value.clone());
+                                                sheets.write()[aidx_val].set_advantage_note(idx, event.value.clone());
                                             }
                                         }
                                     }
@@ -120,6 +122,31 @@ fn App(cx: Scope) -> Element {
                 })
             }
         }
+        div {
+            id: "powers",
+            h1 {
+                "Powers"
+                button {
+                    class: "add",
+                    onclick: move |_| modal_state.set(Modal::NewPowerType),
+                    "+"
+                }
+            }
+            sheets.read()[aidx_val].powers.iter().map(|power| {
+                match power {
+                    PowerEntry::Power(p) => rsx! {
+                        p {
+                            "{p.name}"
+                        }
+                    },
+                    PowerEntry::Array(pa) => rsx! {
+                        p {
+                            "array"
+                        }
+                    }
+                }
+            })
+        }
         match modal_state.get() {
             Modal::Hidden => rsx! {""},
             Modal::AdvantageSearch => rsx! {
@@ -132,7 +159,7 @@ fn App(cx: Scope) -> Element {
                             "Add Advantages"
                             button {
                                 class: "add",
-                                onclick: move |event| modal_state.set(Modal::Hidden),
+                                onclick: move |_| modal_state.set(Modal::Hidden),
                                 "x"
                             }
                         }
@@ -162,7 +189,7 @@ fn App(cx: Scope) -> Element {
                                         td {
                                             button {
                                                 class: "modal_add",
-                                                onclick: move |event| { sheets.write()[aidx_val].add_advantage(idx) },
+                                                onclick: move |_| { sheets.write()[aidx_val].add_advantage(idx) },
                                                 "+"
                                             }
                                         }
@@ -172,7 +199,37 @@ fn App(cx: Scope) -> Element {
                         }
                     }
                 }
-            }
+            },
+            Modal::NewPowerType => rsx!{
+                div {
+                    class: "modal",
+                    div {
+                        class: "modal-content",
+                        h1 {
+                            "Create new power"
+                            button {
+                                class: "add",
+                                onclick: move |_| modal_state.set(Modal::Hidden),
+                                "x"
+                            }
+                        }
+                        button {
+                            onclick: move |_| {
+                                sheets.write()[aidx_val].create_power();
+                                modal_state.set(Modal::Hidden);
+                            },
+                            "New Power"
+                        }
+                        button {
+                            onclick: move |_| {
+                                sheets.write()[aidx_val].create_power_array();
+                                modal_state.set(Modal::Hidden);
+                            },
+                            "New Power Array"
+                        }
+                    }
+                }
+            },
         }
     }
 }

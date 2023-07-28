@@ -3,7 +3,7 @@ use indexmap::IndexMap;
 
 use crate::rulebook::{AdvantageInfo, Rulebook};
 
-#[derive(PartialEq, Props)]
+#[derive(PartialEq)]
 pub struct Character<'a> {
     pub name: String,
     pub identity: String,
@@ -18,17 +18,10 @@ pub struct Character<'a> {
     pub skills: IndexMap<&'a str, i32>,
     pub offense: IndexMap<&'a str, i32>,
     pub advantages: Vec<Advantage>,
-    pub powers: Vec<Power>,
+    pub powers: Vec<PowerEntry>,
     pub conditions: Vec<Condition>,
     pub notes: String,
     pub rulebook: &'a Rulebook<'a>,
-}
-
-#[derive(PartialEq, Props)]
-pub struct DerivedStat<'a> {
-    pub derived_from: &'a str,
-    pub invested: i32,
-    pub total: i32,
 }
 
 #[derive(PartialEq)]
@@ -38,72 +31,46 @@ pub struct Advantage {
     pub notes: Option<String>,
 }
 
-pub enum AdvantageType {
-    Combat,
-    Fortune,
-    General,
-    Skill,
+#[derive(PartialEq)]
+pub enum PowerEntry {
+    Power(Power),
+    Array(PowerArray),
 }
 
-pub struct AdvantageRanks {
-    ranks: i32,
-    max: Option<i32>,
+#[derive(PartialEq)]
+pub struct PowerArray {
+    pub name: String,
+    pub powers: Vec<Power>,
 }
 
-#[derive(PartialEq, Props)]
+#[derive(PartialEq)]
 pub struct Power {
-    name: String,
-    effect: i32,
-    extras: Vec<i32>,
-    flaws: Vec<i32>,
+    pub name: String,
+    pub effect: Vec<PowerEffect>,
+}
+
+#[derive(PartialEq)]
+pub struct PowerEffect {
+    id: usize,
     ranks: i32,
+    extras: Vec<Extra>,
+    flaws: Vec<Flaw>,
     descriptors: String,
-    alt_effects: Vec<Power>,
-    add_effects: Vec<Power>,
+    notes: Option<String>,
 }
 
-pub struct PowerData {
-    name: String,
-    cost: i32,
-    power_type: PowerType,
-    action: Action,
-    range: Range,
-    duration: Duration,
-    applicable_extras: i32,
-    applicable_flaws: i32,
+#[derive(PartialEq)]
+pub struct Extra {
+    id: usize,
+    ranks: Option<i32>,
+    notes: Option<String>,
 }
 
-pub enum Action {
-    Standard,
-    Move,
-    Free,
-    Reaction,
-    None,
-}
-
-pub enum Range {
-    Personal,
-    Close,
-    Ranged,
-    Perception,
-    Rank,
-}
-
-pub enum Duration {
-    Instant,
-    Concentration,
-    Sustained,
-    Continuous,
-    Permanent,
-}
-
-pub enum PowerType {
-    Attack,
-    Control,
-    Defense,
-    General,
-    Movement,
-    Sensory,
+#[derive(PartialEq)]
+pub struct Flaw {
+    id: usize,
+    ranks: Option<i32>,
+    notes: Option<String>,
 }
 
 #[derive(PartialEq, Props)]
@@ -246,6 +213,17 @@ impl<'a> Character<'a> {
     pub fn delete_advantage(&mut self, idx: usize) {
         self.advantages.remove(idx);
     }
+
+    pub fn create_power(&mut self) {
+        self.powers.push(PowerEntry::Power(Power::new()))
+    }
+
+    pub fn create_power_array(&mut self) {
+        self.powers.push(PowerEntry::Array(PowerArray {
+            name: String::from("array"),
+            powers: Vec::new(),
+        }))
+    }
 }
 
 impl Advantage {
@@ -258,6 +236,15 @@ impl Advantage {
             } else {
                 None
             },
+        }
+    }
+}
+
+impl Power {
+    pub fn new() -> Self {
+        Self {
+            name: String::from("New Power"),
+            effect: Vec::new(),
         }
     }
 }
