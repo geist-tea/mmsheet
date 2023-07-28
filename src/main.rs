@@ -42,6 +42,7 @@ enum Modal {
     Hidden,
     AdvantageSearch,
     NewPowerType,
+    NewPowerEffect,
 }
 
 fn App(cx: Scope) -> Element {
@@ -138,10 +139,14 @@ fn App(cx: Scope) -> Element {
                         p {
                             "{p.name}"
                         }
+                        button {
+                            onclick: move |_| modal_state.set(Modal::NewPowerEffect),
+                            "+"
+                        }
                     },
                     PowerEntry::Array(pa) => rsx! {
                         p {
-                            "array"
+                            "{pa.name}: Array"
                         }
                     }
                 }
@@ -226,6 +231,75 @@ fn App(cx: Scope) -> Element {
                                 modal_state.set(Modal::Hidden);
                             },
                             "New Power Array"
+                        }
+                    }
+                }
+            },
+            Modal::NewPowerEffect => rsx!{
+                div {
+                    class: "modal",
+                    div {
+                        class: "modal-content",
+                        h1 {
+                            "Add Power Effect"
+                            button {
+                                class: "add",
+                                onclick: move |_| modal_state.set(Modal::Hidden),
+                                "x"
+                            }
+                        }
+                        input {
+                            r#type: "text",
+                            value: "{search.read()}",
+                            oninput: |event| { search.with_mut(|s| { *s = event.value.clone() })},
+                        }
+                        table {
+                            tr {
+                                th {"Name"}
+                                th {"Type"}
+                                th {"Action"}
+                                th {"Range"}
+                                th {"Duration"}
+                                th {"Resistance"}
+                                th {"Cost"}
+                            }
+                            RULEBOOK.powers.iter().enumerate().filter(|(_, p)| p.name.contains(search.read().as_str())).map(|(idx, p)| {
+                                rsx! {
+                                    tr {
+                                        td {
+                                            "{p.name}"
+                                        }
+                                        td {
+                                           "{p.r#type}"
+                                        }
+                                        td {
+                                            "{p.action}"
+                                        }
+                                        td {
+                                            "{p.range}"
+                                        }
+                                        td {
+                                            "{p.duration}"
+                                        }
+                                        td {
+                                            match &p.resisted_by {
+                                                Some(v) => rsx!{ "{v.join(\", \")}" },
+                                                None => rsx!{"—"},
+                                            }
+                                        }
+                                        td {
+                                            "{p.cost} per rank"
+                                        }
+                                        td {
+                                            button {
+                                                class: "modal_add",
+                                                onclick: move |_| { sheets.write()[aidx_val].add_advantage(idx) },
+                                                "+"
+                                            }
+                                        }
+                                    }
+                                }
+                            })
                         }
                     }
                 }

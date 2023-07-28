@@ -31,25 +31,50 @@ impl fmt::Display for AdvantageType {
 }
 
 #[derive(PartialEq, serde::Deserialize)]
-enum AttackType {
+pub enum AttackType {
     Close,
     Ranged,
 }
 
+impl fmt::Display for AttackType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            AttackType::Close => write!(f, "Close"),
+            AttackType::Ranged => write!(f, "Ranged"),
+        }
+    }
+}
+
 #[derive(PartialEq, serde::Deserialize)]
 pub struct PowerInfo {
-    name: String,
-    description: String,
-    action: Action,
-    range: Range,
-    duration: PowerDuration,
-    cost: i32,
-    attack: Option<AttackType>,
-    dc: Option<i32>,
-    resisted_by: Option<Vec<String>>,
-    notes: bool,
-    applicable_extras: Vec<usize>,
-    applicable_flaws: Vec<usize>,
+    pub name: String,
+    pub description: String,
+    pub r#type: PowerType,
+    pub action: Action,
+    pub range: Range,
+    pub duration: PowerDuration,
+    pub cost: PowerCost,
+    pub attack: Option<AttackType>,
+    pub dc: Option<i32>,
+    pub resisted_by: Option<Vec<String>>,
+    pub notes: bool,
+    pub applicable_extras: Vec<usize>,
+    pub applicable_flaws: Vec<usize>,
+}
+
+#[derive(PartialEq, serde::Deserialize)]
+pub enum PowerCost {
+    Cost(i32),
+    Range(i32, i32),
+}
+
+impl fmt::Display for PowerCost {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            PowerCost::Cost(i) => write!(f, "{}", i),
+            PowerCost::Range(min, max) => write!(f, "{}-{}", min, max),
+        }
+    }
 }
 
 #[derive(PartialEq, serde::Deserialize)]
@@ -62,6 +87,19 @@ pub enum PowerType {
     Sensory,
 }
 
+impl fmt::Display for PowerType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            PowerType::Attack => write!(f, "Attack"),
+            PowerType::Control => write!(f, "Control"),
+            PowerType::Defense => write!(f, "Defense"),
+            PowerType::General => write!(f, "General"),
+            PowerType::Movement => write!(f, "Movement"),
+            PowerType::Sensory => write!(f, "Sensory"),
+        }
+    }
+}
+
 #[derive(PartialEq, serde::Deserialize)]
 pub enum PowerDuration {
     Instant,
@@ -69,6 +107,18 @@ pub enum PowerDuration {
     Sustained,
     Continuous,
     Permanent,
+}
+
+impl fmt::Display for PowerDuration {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            PowerDuration::Instant => write!(f, "Instant"),
+            PowerDuration::Concentration => write!(f, "Concentration"),
+            PowerDuration::Sustained => write!(f, "Sustained"),
+            PowerDuration::Continuous => write!(f, "Continuous"),
+            PowerDuration::Permanent => write!(f, "Permanent"),
+        }
+    }
 }
 
 #[derive(PartialEq, serde::Deserialize)]
@@ -80,6 +130,18 @@ pub enum Range {
     Rank,
 }
 
+impl fmt::Display for Range {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Range::Personal => write!(f, "Personal"),
+            Range::Close => write!(f, "Close"),
+            Range::Ranged => write!(f, "Ranged"),
+            Range::Perception => write!(f, "Perception"),
+            Range::Rank => write!(f, "Rank"),
+        }
+    }
+}
+
 #[derive(PartialEq, serde::Deserialize)]
 pub enum Action {
     Standard,
@@ -87,6 +149,18 @@ pub enum Action {
     Free,
     Reaction,
     None,
+}
+
+impl fmt::Display for Action {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Action::Standard => write!(f, "Standard"),
+            Action::Move => write!(f, "Move"),
+            Action::Free => write!(f, "Free"),
+            Action::Reaction => write!(f, "Reaction"),
+            Action::None => write!(f, "None"),
+        }
+    }
 }
 
 #[derive(PartialEq)]

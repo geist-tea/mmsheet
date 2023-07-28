@@ -1,7 +1,9 @@
-use dioxus::prelude::Props;
 use indexmap::IndexMap;
 
-use crate::rulebook::{AdvantageInfo, Rulebook};
+use crate::{
+    rulebook::{AdvantageInfo, Rulebook},
+    RULEBOOK,
+};
 
 #[derive(PartialEq)]
 pub struct Character<'a> {
@@ -19,7 +21,7 @@ pub struct Character<'a> {
     pub offense: IndexMap<&'a str, i32>,
     pub advantages: Vec<Advantage>,
     pub powers: Vec<PowerEntry>,
-    pub conditions: Vec<Condition>,
+    // pub conditions: Vec<Condition>,
     pub notes: String,
     pub rulebook: &'a Rulebook<'a>,
 }
@@ -73,11 +75,11 @@ pub struct Flaw {
     notes: Option<String>,
 }
 
-#[derive(PartialEq, Props)]
-pub struct Condition {
-    name: String,
-    stat_changes: Vec<fn(String, i32) -> i32>,
-}
+// #[derive(PartialEq, Props)]
+// pub struct Condition {
+//     name: String,
+//     stat_changes: Vec<fn(String, i32) -> i32>,
+// }
 
 impl<'a> Character<'a> {
     pub fn new(rules: &'a Rulebook) -> Self {
@@ -125,12 +127,13 @@ impl<'a> Character<'a> {
             offense: IndexMap::from([("Unarmed", 0)]),
             advantages: Vec::new(),
             powers: Vec::new(),
-            conditions: Vec::new(),
+            // conditions: Vec::new(),
             notes: String::new(),
             rulebook: rules,
         }
     }
 
+    //TODO
     pub fn calculate_points_spent(&self) -> i32 {
         0
     }
@@ -224,6 +227,21 @@ impl<'a> Character<'a> {
             powers: Vec::new(),
         }))
     }
+
+    pub fn add_effect_to_power(
+        &mut self,
+        power_idx: usize,
+        effect_id: usize,
+        array_idx: Option<usize>,
+    ) {
+        match &mut self.powers[power_idx] {
+            PowerEntry::Power(ref mut p) => p.add_effect(effect_id),
+            PowerEntry::Array(ref mut pa) => match array_idx {
+                Some(i) => pa.powers[i].add_effect(effect_id),
+                None => (),
+            },
+        }
+    }
 }
 
 impl Advantage {
@@ -246,5 +264,17 @@ impl Power {
             name: String::from("New Power"),
             effect: Vec::new(),
         }
+    }
+
+    pub fn add_effect(&mut self, id: usize) {
+        let has_notes = RULEBOOK.powers[id].notes;
+        self.effect.push(PowerEffect {
+            id: id,
+            ranks: 0,
+            extras: Vec::new(),
+            flaws: Vec::new(),
+            descriptors: String::new(),
+            notes: if has_notes { Some(String::new()) } else { None },
+        })
     }
 }
