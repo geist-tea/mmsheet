@@ -53,12 +53,12 @@ pub struct Power {
 
 #[derive(PartialEq)]
 pub struct PowerEffect {
-    id: usize,
-    ranks: i32,
-    extras: Vec<Extra>,
-    flaws: Vec<Flaw>,
-    descriptors: String,
-    notes: Option<String>,
+    pub id: usize,
+    pub ranks: i32,
+    pub extras: Vec<Extra>,
+    pub flaws: Vec<Flaw>,
+    pub descriptors: String,
+    pub notes: Option<String>,
 }
 
 #[derive(PartialEq)]
@@ -270,7 +270,7 @@ impl Power {
         let has_notes = RULEBOOK.powers[id].notes;
         self.effect.push(PowerEffect {
             id: id,
-            ranks: 0,
+            ranks: 1,
             extras: Vec::new(),
             flaws: Vec::new(),
             descriptors: String::new(),

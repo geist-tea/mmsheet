@@ -42,7 +42,7 @@ enum Modal {
     Hidden,
     AdvantageSearch,
     NewPowerType,
-    NewPowerEffect,
+    NewPowerEffect(usize, Option<usize>),
 }
 
 fn App(cx: Scope) -> Element {
@@ -133,19 +133,66 @@ fn App(cx: Scope) -> Element {
                     "+"
                 }
             }
-            sheets.read()[aidx_val].powers.iter().map(|power| {
+            sheets.read()[aidx_val].powers.iter().enumerate().map(|(idx, power)| {
                 match power {
                     PowerEntry::Power(p) => rsx! {
-                        p {
+                        h2 {
                             "{p.name}"
                         }
                         button {
-                            onclick: move |_| modal_state.set(Modal::NewPowerEffect),
+                            onclick: move |_| modal_state.set(Modal::NewPowerEffect(idx, None)),
                             "+"
+                        }
+                        table {
+                            p.effect.iter().map(|e| {
+                                rsx! {
+                                    tr {
+                                        td { "{RULEBOOK.powers[e.id].name}" }
+                                        td {
+                                            input {
+                                                r#type: "number",
+                                                value: "{e.ranks}",
+                                            }
+                                        }
+                                        match &e.notes {
+                                            Some(notes) => rsx! {
+                                                td {
+                                                    input {
+                                                        r#type: "text",
+                                                        value: "{notes}",
+                                                    }
+                                                }
+                                            },
+                                            None => rsx! {td{""}},
+                                        }
+                                        match &RULEBOOK.powers[e.id].resisted_by {
+                                            Some(res) => rsx! {
+                                                "DC {&RULEBOOK.powers[e.id].dc.unwrap_or(0) + &e.ranks}"
+                                                select {
+                                                    res.iter().map(|r| {
+                                                        rsx! {
+                                                            option {
+                                                                "{r}"
+                                                            }
+                                                        }
+                                                    })
+                                                }
+                                            },
+                                            None => rsx! {""},
+                                        }
+                                        td {
+                                            button {"+"}
+                                        }
+                                        td {
+                                            button {"+"}
+                                        }
+                                    }
+                                }
+                            })
                         }
                     },
                     PowerEntry::Array(pa) => rsx! {
-                        p {
+                        h2 {
                             "{pa.name}: Array"
                         }
                     }
@@ -235,7 +282,7 @@ fn App(cx: Scope) -> Element {
                     }
                 }
             },
-            Modal::NewPowerEffect => rsx!{
+            Modal::NewPowerEffect(p_idx, a_idx) => rsx!{
                 div {
                     class: "modal",
                     div {
@@ -293,7 +340,7 @@ fn App(cx: Scope) -> Element {
                                         td {
                                             button {
                                                 class: "modal_add",
-                                                onclick: move |_| { sheets.write()[aidx_val].add_advantage(idx) },
+                                                onclick: move |_| { sheets.write()[aidx_val].add_effect_to_power(*p_idx, idx, *a_idx) },
                                                 "+"
                                             }
                                         }
