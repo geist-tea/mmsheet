@@ -137,11 +137,14 @@ fn App(cx: Scope) -> Element {
                 match power {
                     PowerEntry::Power(p) => rsx! {
                         h2 {
-                            "{p.name}"
-                        }
-                        button {
-                            onclick: move |_| modal_state.set(Modal::NewPowerEffect(idx, None)),
-                            "+"
+                            input {
+                                r#type: "text",
+                                value: "{p.name}",
+                            }
+                            button {
+                                onclick: move |_| modal_state.set(Modal::NewPowerEffect(idx, None)),
+                                "+"
+                            }
                         }
                         table {
                             p.effect.iter().map(|e| {
@@ -154,12 +157,20 @@ fn App(cx: Scope) -> Element {
                                                 value: "{e.ranks}",
                                             }
                                         }
+                                        td {
+                                            input {
+                                                r#type: "text",
+                                                value: "{e.descriptors}",
+                                                placeholder: "Descriptors"
+                                            }
+                                        }
                                         match &e.notes {
                                             Some(notes) => rsx! {
                                                 td {
                                                     input {
                                                         r#type: "text",
                                                         value: "{notes}",
+                                                        placeholder: "Notes"
                                                     }
                                                 }
                                             },
@@ -178,7 +189,7 @@ fn App(cx: Scope) -> Element {
                                                     })
                                                 }
                                             },
-                                            None => rsx! {""},
+                                            None => rsx! {td{""}},
                                         }
                                         td {
                                             button {"+"}
@@ -199,6 +210,7 @@ fn App(cx: Scope) -> Element {
                 }
             })
         }
+        Notes {}
         match modal_state.get() {
             Modal::Hidden => rsx! {""},
             Modal::AdvantageSearch => rsx! {

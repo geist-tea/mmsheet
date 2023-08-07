@@ -479,3 +479,23 @@ pub fn AdvantageSearchModal(cx: Scope) -> Element {
         }
     }
 }
+
+pub fn Notes(cx: Scope) -> Element {
+    let sheets = use_shared_state::<Vec<Character>>(cx).unwrap();
+    let active_idx = use_shared_state::<usize>(cx).unwrap();
+
+    let aidx_val = *active_idx.read();
+
+    render! {
+        div {
+            id:"notes",
+            h1 {
+                "Campaign Notes"
+            }
+            textarea {
+                rows: "10",
+                oninput: move |event| { sheets.write()[aidx_val].notes = event.value.clone() }
+            }
+        }
+    }
+}
